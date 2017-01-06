@@ -8,7 +8,7 @@ import time
 import PIL.Image
 import numpy as np
 
-class ASCOMCameraCapture(Measurement):
+class ASCOMCameraCaptureMeasure(Measurement):
     
     name = 'ascom_camera_capture'
     

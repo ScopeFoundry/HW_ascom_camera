@@ -1,11 +1,12 @@
+from __future__ import absolute_import
 from ScopeFoundry import HardwareComponent
 try:
-    from equipment.ascom_camera import ASCOMCamera
+    from .ascom_camera import ASCOMCamera
 except Exception as err:
-    print("could not load equipment.ascom_camera", err)
+    print("could not load ascom_camera", err)
 import numpy as np
 
-class ASCOMCameraHC(HardwareComponent):
+class ASCOMCameraHW(HardwareComponent):
     
     name = 'ascom_camera'
     
