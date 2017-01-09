@@ -78,11 +78,13 @@ class ASCOMCameraHW(HardwareComponent):
             lq.hardware_read_func = None
             lq.hardware_set_func = None
         
-        self.cam.Connected = False
-
-        # clean up hardware object
-        del self.cam
-        del self.ac
+        if hasattr(self, 'cam'):
+            self.cam.Connected = False
+            # clean up device object
+            del self.cam
+        if hasattr(self, 'ac'):
+            # clean up device object
+            del self.ac
 
                 
     def read_cam_param_func(self, name):
