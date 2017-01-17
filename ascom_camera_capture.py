@@ -53,7 +53,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
         
         cam_hc = self.app.hardware.ascom_camera
         
-        print self.name, 'interrupted', self.interrupt_measurement_called
+        print(self.name, 'interrupted', self.interrupt_measurement_called)
         
         while not self.interrupt_measurement_called:
             self.img = cam_hc.acq_single_exposure()
@@ -62,7 +62,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
                 # save image
                 try:
                     t0 = time.time()
-                    print self.name,'asdf', self.img.dtype
+                    print( self.name,'asdf', self.img.dtype)
                     if self.settings['save_png']:
                         scipy.misc.imsave("%i_%s.png" % (t0, self.name), self.img)
                     if self.settings['save_tif']:

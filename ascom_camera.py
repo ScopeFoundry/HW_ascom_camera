@@ -27,10 +27,10 @@ class ASCOMCamera(object):
         while not self.cam.ImageReady:
             time.sleep(0.01*Duration)
         t1 = time.time()
-        print "wait til image_ready took", t1-t0
+        print("wait til image_ready took", t1-t0)
         dat = np.array(self.cam.ImageArray)
         t2  = time.time()
-        print "retrieve and convert took", t2-t1
+        print("retrieve and convert took", t2-t1)
         return dat
         
 if __name__ == "__main__":
@@ -45,16 +45,16 @@ if __name__ == "__main__":
     
     #print "Readout", ac.cam.ReadoutMode, list(ac.cam.ReadoutModes)
 
-    print ac.cam.BinX, ac.cam.MaxBinX, ac.cam.NumX
+    print(ac.cam.BinX, ac.cam.MaxBinX, ac.cam.NumX)
     ac.cam.BinX = 1
     ac.cam.NumX = ac.cam.CameraXSize/ac.cam.BinX
     ac.cam.BinY = 1
     ac.cam.NumY = ac.cam.CameraYSize/ac.cam.BinY
 
-    print ac.cam.StartX, ac.cam.StartY
+    print(ac.cam.StartX, ac.cam.StartY)
     #ac.cam.BinY = 2
     dat = ac.acq_single_exposure(0.1)
-    print dat.shape
+    print(dat.shape)
     
     import matplotlib.pylab as plt
     plt.imshow(dat.T, interpolation='none', vmin=np.percentile(dat, 1), vmax=np.percentile(dat,99), cmap='gray')
