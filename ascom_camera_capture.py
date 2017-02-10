@@ -1,12 +1,15 @@
 from ScopeFoundry import Measurement
 from ScopeFoundry.helper_funcs import sibling_path, load_qt_ui_file
+from ScopeFoundry import h5_io
 import pyqtgraph as pg
 import scipy.misc 
 import time
 #from libtiff import TIFF
 #import tifffile as tiff
-import PIL.Image
+#import PIL.Image
 import numpy as np
+from .tiffile import imsave as tif_imsave
+import os
 
 class ASCOMCameraCaptureMeasure(Measurement):
     
@@ -18,8 +21,11 @@ class ASCOMCameraCaptureMeasure(Measurement):
         #S.New('bg_subtract', dtype=bool, initial=False, ro=False)
         #S.New('acquire_bg',  dtype=bool, initial=False, ro=False)
         S.New('continuous', dtype=bool, initial=True, ro=False)
-        S.New('save_png', dtype=bool, initial=True, ro=False)
+        S.New('save_png', dtype=bool, initial=False, ro=False)
         S.New('save_tif', dtype=bool, initial=True, ro=False)
+        S.New('save_ini', dtype=bool, initial=True, ro=False)
+        S.New('save_h5', dtype=bool, initial=False, ro=False)
+        
         
         self.ui_filename = sibling_path(__file__,"ascom_camera_capture.ui")
         self.ui = load_qt_ui_file(self.ui_filename)
@@ -30,9 +36,11 @@ class ASCOMCameraCaptureMeasure(Measurement):
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
 
-        S.continuous.connect_bidir_to_widget(self.ui.continuous_checkBox)
-        S.save_png.connect_bidir_to_widget(self.ui.save_png_checkBox)
-        S.save_tif.connect_bidir_to_widget(self.ui.save_tif_checkBox)
+        S.continuous.connect_to_widget(self.ui.continuous_checkBox)
+        S.save_png.connect_to_widget(self.ui.save_png_checkBox)
+        S.save_tif.connect_to_widget(self.ui.save_tif_checkBox)
+        S.save_ini.connect_to_widget(self.ui.save_ini_checkBox)
+        S.save_h5.connect_to_widget( self.ui.save_h5_checkBox )
         
         cam_ui_connections = [
             ('exp_time', 'exp_time_doubleSpinBox'),
@@ -43,31 +51,39 @@ class ASCOMCameraCaptureMeasure(Measurement):
             ('StartX', 'startx_doubleSpinBox'),
             ('StartY', 'starty_doubleSpinBox')]
         
-        cam_hc = self.app.hardware.ascom_camera
+        cam_hw = self.app.hardware.ascom_camera
         
         for lq_name, widget_name in cam_ui_connections:                          
-            cam_hc.settings.get_lq(lq_name).connect_bidir_to_widget(getattr(self.ui, widget_name))
+            cam_hw.settings.get_lq(lq_name).connect_to_widget(getattr(self.ui, widget_name))
 
 
     def run(self):
         
-        cam_hc = self.app.hardware.ascom_camera
+        cam_hw = self.app.hardware.ascom_camera
         
         print(self.name, 'interrupted', self.interrupt_measurement_called)
         
         while not self.interrupt_measurement_called:
-            self.img = cam_hc.acq_single_exposure()
+            self.img = cam_hw.acq_single_exposure()
             
             if not self.settings['continuous']:
                 # save image
                 try:
                     t0 = time.time()
+                    fname = os.path.join(self.app.settings['save_dir'], "%i_%s" % (t0, self.name))
                     print( self.name,'asdf', self.img.dtype)
+                    if self.settings['save_ini']:
+                        self.app.settings_save_ini(fname + ".ini")
                     if self.settings['save_png']:
-                        scipy.misc.imsave("%i_%s.png" % (t0, self.name), self.img)
+                        scipy.misc.imsave(fname + ".png", self.img)
                     if self.settings['save_tif']:
-                        im = PIL.Image.fromarray(self.img.T)
-                        im.save("%i_%s.tif" % (t0, self.name))
+                        #im = PIL.Image.fromarray(self.img.T)
+                        #im.save("%i_%s.tif" % (t0, self.name), compression=6)
+                        tif_imsave(fname + ".tif", self.img.T.astype(np.uint16), compress=0)
+                    if self.settings['save_h5']:
+                        with h5_io.h5_base_file(self.app,  fname = fname + ".h5") as H:
+                            M = h5_io.h5_create_measurement_group(self, H)
+                            M.create_dataset('img', data=self.img, compression='gzip')
                 finally:
                     break # end the while loop for non-continuous scans
             else:
@@ -86,6 +102,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
         
     
     def update_display(self):
-        self.imview.setImage(self.img, autoRange=False)
+        if hasattr(self, "img"):
+            self.imview.setImage(self.img, autoRange=False)
     
     
