@@ -69,6 +69,8 @@ class ASCOMCameraHW(HardwareComponent):
 
         S.CoolerOn.hardware_set_func = self.write_cam_param_func('CoolerOn')
         
+        S['CoolerOn'] = True
+        
         self.read_from_hardware()
                 
     def disconnect(self):

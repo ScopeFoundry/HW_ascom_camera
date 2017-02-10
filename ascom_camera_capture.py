@@ -86,6 +86,6 @@ class ASCOMCameraCaptureMeasure(Measurement):
         
     
     def update_display(self):
-        self.imview.setImage(self.img)
+        self.imview.setImage(self.img, autoRange=False)
     
     
