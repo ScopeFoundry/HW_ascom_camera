@@ -82,7 +82,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
                         tif_imsave(fname + ".tif", self.img.T.astype(np.uint16), compress=0)
                     if self.settings['save_h5']:
                         with h5_io.h5_base_file(self.app,  fname = fname + ".h5") as H:
-                            M = h5_io.h5_create_measurement_group(self, H)
+                            M = h5_io.h5_create_measurement_group(measurement=self, h5group=H)
                             M.create_dataset('img', data=self.img, compression='gzip')
                 finally:
                     break # end the while loop for non-continuous scans
