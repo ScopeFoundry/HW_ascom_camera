@@ -71,11 +71,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
                 try:
                     t0 = time.time()
                     fname = os.path.join(self.app.settings['save_dir'], "%i_%s" % (t0, self.name))
-<<<<<<< HEAD
                     print( self.name,'asdf', self.img.dtype, fname)
-=======
-                    print( self.name,'asdf', self.img.dtype)
->>>>>>> d23eddb51984f311015483594899062df7612379
                     if self.settings['save_ini']:
                         self.app.settings_save_ini(fname + ".ini")
                     if self.settings['save_png']:
@@ -88,12 +84,9 @@ class ASCOMCameraCaptureMeasure(Measurement):
                         with h5_io.h5_base_file(self.app,  fname = fname + ".h5") as H:
                             M = h5_io.h5_create_measurement_group(measurement=self, h5group=H)
                             M.create_dataset('img', data=self.img, compression='gzip')
-<<<<<<< HEAD
                 except Exception as e:
                     print('Error saving files!', e)
                     
-=======
->>>>>>> d23eddb51984f311015483594899062df7612379
                 finally:
                     break # end the while loop for non-continuous scans
             else:
