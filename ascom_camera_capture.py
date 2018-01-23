@@ -86,6 +86,7 @@ class ASCOMCameraCaptureMeasure(Measurement):
                             M.create_dataset('img', data=self.img, compression='gzip')
                 except Exception as e:
                     print('Error saving files!', e)
+                    raise e
                     
                 finally:
                     break # end the while loop for non-continuous scans
