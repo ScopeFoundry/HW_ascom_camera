@@ -64,7 +64,20 @@ class ASCOMCameraCaptureMeasure(Measurement):
         print(self.name, 'interrupted', self.interrupt_measurement_called)
         
         while not self.interrupt_measurement_called:
-            self.img = cam_hw.acq_single_exposure()
+            # Blocking version
+            #self.img = cam_hw.acq_single_exposure()
+            
+            # non blocking version
+            cam_hw.ac.StartExposure(cam_hw.settings['exp_time'])
+            t0 = time.time()
+            while not cam_hw.ac.is_image_ready():
+                if self.interrupt_measurement_called:
+                    break
+                time.sleep(0.05)
+                self.settings['progress'] = 100.0* (time.time() - t0)/cam_hw.settings['exp_time'] 
+            self.img = cam_hw.ac.read_image_data()
+            
+            
             
             if not self.settings['continuous']:
                 # save image

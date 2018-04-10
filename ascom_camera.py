@@ -18,7 +18,7 @@ class ASCOMCamera(object):
         
         self.Name = cam.Name
         
-    def StartExposure(self, Duration, Light):
+    def StartExposure(self, Duration, Light=True):
         self.cam.StartExposure(Duration, Light)
     
     def acq_single_exposure(self, Duration, Light=True):
@@ -31,6 +31,13 @@ class ASCOMCamera(object):
         dat = np.array(self.cam.ImageArray)
         t2  = time.time()
         print("retrieve and convert took", t2-t1)
+        return dat
+    
+    def is_image_ready(self):
+        return self.cam.ImageReady
+    
+    def read_image_data(self):
+        dat = np.array(self.cam.ImageArray)
         return dat
         
 if __name__ == "__main__":
