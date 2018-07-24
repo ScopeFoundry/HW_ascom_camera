@@ -25,10 +25,18 @@ Author
 Edward S. Barnard <esbarnard@lbl.gov>
 
 
+License
+----------
+
+
+Keywords
+----------
+Camera, CCD
+
 Requirements
 ------------
 
-	* ScopeFoundry
+	* [ScopeFoundry](http://www.scopefoundry.org)
 	* [pywin32](https://sourceforge.net/projects/pywin32/)
 	* [ASCOM](http://www.ascom-standards.org)
 	* Windows XP or later
